@@ -11,6 +11,9 @@ print('## Current: Version 1.0 released on 6th April, 2018                  ##')
 print('## Based on procedures in dos_lib.py Version 1.0                     ##')
 print('#######################################################################')
 
+#History
+#added rotation slider April 2018.
+
 #TO BE DONE
 # Put the posibility of two etalons
 # Introduce posibility of changing no.
@@ -90,23 +93,26 @@ l6, = d_prof.plot(lan*1e9-lcentral, s[2,3,:], lw=1, color='black',label='d')
 #l4, = plt.semilogy(lan-617.234, s[1][0][:], lw=1, color='black',linestyle=':',label='b')
 
 axcolor = 'lightgoldenrodyellow'
+ax_rot =     plt.axes([0.25, 0.24, 0.65, 0.03], facecolor=axcolor)
 ax_theta_i = plt.axes([0.25, 0.20, 0.65, 0.03], facecolor=axcolor)
 ax_h =       plt.axes([0.25, 0.16, 0.65, 0.03], facecolor=axcolor)
 ax_theta_3 = plt.axes([0.25, 0.12, 0.65, 0.03], facecolor=axcolor)
 ax_r =       plt.axes([0.25, 0.08, 0.65, 0.03], facecolor=axcolor)
 ax_ne =      plt.axes([0.25, 0.04, 0.65, 0.03], facecolor=axcolor)
 
+s_rot =     Slider(ax_rot     ,  'Rotation angle (deg).', 0, 90.0, valinit=0.,valfmt='%0.4f')
 s_theta_i = Slider(ax_theta_i, 'Theta_i (degree)', 0., 1.0, valinit=0.55,valfmt='%0.4f')
 s_h =       Slider(ax_h      , 'H (mm)', 0.1, 1.0, valinit=0.251,valfmt='%0.4f')
 s_theta_3 = Slider(ax_theta_3, 'Theta_3 (degree)', 0., 90.0, valinit=0.0,valfmt='%0.4f')
 s_r =       Slider(ax_r      , 'Reflt.', 0.05, 1, valinit=0.92,valfmt='%0.3f')
 s_ne =      Slider(ax_ne     , 'Refraction index (e).', 2.0, 3.0, valinit=2.2,valfmt='%0.4f')
 
+
 def update(val):
     dl.h = s_h.val*1e-3 #Etalon width
     dl.Reflectance = s_r.val #Reflectance
     dl.n3 = s_ne.val #Reflectance
-    s = dl.FPM(np.radians(s_theta_i.val), lan , np.radians(s_theta_3.val), np.radians(0.),doprint='false')
+    s = dl.FPM(np.radians(s_theta_i.val), lan , np.radians(s_theta_3.val), np.radians(s_rot.val),doprint='false')
     ssmax = np.maximum(s[0,0,:]-s[1,0,:],s[0,0,:]+s[1,0,:])
     ssmin = np.minimum(s[0,0,:]-s[1,0,:],s[0,0,:]+s[1,0,:])
     main_abx_max = np.amax(ssmax)
@@ -138,6 +144,7 @@ def update(val):
     l5.set_ydata(s[2,2,:])
     l6.set_ydata(s[2,3,:])
     fig.canvas.draw_idle()
+s_rot.on_changed(update)
 s_theta_i.on_changed(update)
 s_h.on_changed(update)
 s_theta_3.on_changed(update)
@@ -148,6 +155,7 @@ resetax = plt.axes([0.03, 0.03, 0.05, 0.04])
 button = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975',)
 
 def reset(event):
+    s_rot.reset()
     s_theta_i.reset()
     s_h.reset()
     s_theta_3.reset()

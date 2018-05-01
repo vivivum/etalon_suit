@@ -3,6 +3,8 @@ import numpy as np
 from numpy import pi
 import matplotlib.pyplot as plt
 import time
+import matplotlib as mpl #dos
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 # Version 1.0
 
@@ -11,6 +13,8 @@ print('## David Orozco (oroco@iaa.es) and Francisco Bailén (fbailen@iaa.es) ##'
 print('## Instituto de Astrofísica de Granada (IAA-CSIC)                    ##')
 print('## Current: Version 1.0 released on 6th April, 2018                  ##')
 print('#######################################################################')
+#TO BE DONE
+# Put the posibility to add extra finnesse to the etalon
 
     #Niobato de Litio parametros por defecto (no birefringencia)
 no = 2.2926446 ##Ordinary refractive index
@@ -350,6 +354,12 @@ def ROT(alpha):
 
     return ROT
 
+def colorbar(mappable):
+    ax = mappable.axes
+    fig = ax.figure
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    return fig.colorbar(mappable, cax=cax)
 
 # # Function definition is here
 # def printinfo( arg1, *vartuple ):

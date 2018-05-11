@@ -22,6 +22,11 @@ n3 = 2.2 #n3
 h = 251.811e-6 #Etalon h [Meters]
 Reflectance = 0.925 #Reflectance
 Absorptance = 0.0 #Absorptance
+Volt = 0. #votage (volts)
+#In meters
+r13 = 9.6e-12
+r33 = 30.9e-12
+d33 = 26.0e-12
 
 def array(*args, **kwargs):
     kwargs.setdefault("dtype", np.float32)
@@ -39,20 +44,27 @@ tau = lambda A,R: (1-A/(1-R))**2
 #Calculates de cos(theta_o) angle from incidence angle theta_i"
 # See eqn.48 in Paper I
 # output is in radians
-cos_theta_o = lambda theta_i:np.sqrt( 1.0 - (np.sin(theta_i)/no)**2 )
+cos_theta_o = lambda theta_i:np.sqrt( 1.0 - (np.sin(theta_i)/no_v())**2 )
 
 # "This calculates the phase shift between rays for the ordinary axis"
 # lambda and h in SI
 # output is in rad
-delta = lambda theta_i, lda , theta = 2*pi: 4.0*pi*no*h*cos_theta_o(theta_i)/lda + 2*np.cos(theta)
+delta = lambda theta_i, lda , theta = 2*pi: 4.0*pi*no_v()*h*cos_theta_o(theta_i)/lda + 2*np.cos(theta)
+
+def no_v():
+    return no - r13*no**3.*Volt/2./h
+
+def n3_v():
+    return n3 - r33*n3**3.*Volt/2./h
 
 def phi(theta_i, lda , theta_3):
     # "This calculates the retardance between the ord. and ext. rays"
     # lambda in nm and h in mm
     # output is in rad
-    n = (no + n3) / 2.0
+    n = (no_v() + n3_v()) / 2.0
     theta_prime_rad = np.arcsin( np.sin( theta_i )/n )
-    phi_val = ( 4.0 * pi * h * (n3 - no)
+    phi_val = ( 4.0 * pi * (h + d33*Volt)
+        * (no_v() - n3_v() + Volt * (r13*no_v()**3. - r33*n3_v()**3.) )
         * np.sin( theta_prime_rad - theta_3 )**2
         / ( lda * np.cos(theta_prime_rad) ) )
     return phi_val
@@ -169,13 +181,13 @@ def FPM(theta_i, lda , theta_3, r_angle, doprint='false'):
 #FJB version (numerically)
 
 def deltao(wave,theta):
-    deltao=(4*pi*h/wave)*np.sqrt(no**2-1+(np.cos(theta))**2)
+    deltao=(4*pi*h/wave)*np.sqrt(no_v()**2-1+(np.cos(theta))**2)
     return deltao
 
 def deltae(wave,theta,theta3):
-    n=(no+n3)/2
+    n=(no_v()+n3_v())/2
     thetat=np.arcsin(np.sin(theta)/n)
-    phi=(4*pi*h*n)*(n3-no)*\
+    phi=(4*pi*h*n)*(n3_v()-no_v())*\
     (np.sin(thetat-theta3))**2/(wave*np.sqrt(n**2-(np.sin(theta))**2))
     deltae=phi+deltao(wave,theta)
     return deltae

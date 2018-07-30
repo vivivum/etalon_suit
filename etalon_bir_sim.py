@@ -1,4 +1,11 @@
 #conf python
+import matplotlib as mpl
+# bug manifests when using both TkAgg and toolmanager
+# # Used to make textbox to work
+# mpl.use('TkAgg')
+# mpl.rcParams['toolbar'] = 'toolmanager'
+# # bug manifests when using both TkAgg and toolmanager
+
 import numpy as np
 import matplotlib.pyplot as plt
 import dos_lib as dl #MY LIBRARY
@@ -109,6 +116,13 @@ s_theta_3 = Slider(ax_theta_3, 'Theta_3 (degree)', 0., 90.0, valinit=0.0,valfmt=
 s_r =       Slider(ax_r      , 'Reflt.', 0.05, 1, valinit=0.92,valfmt='%0.3f')
 s_ne =      Slider(ax_ne     , 'Refraction index (e).', 2.0, 3.0, valinit=2.2,valfmt='%0.4f')
 
+# def func(vv):
+#     print('hola',vv)
+#
+# ax_absorp_tex =    plt.axes([0.05, 0.60, 0.10, 0.03], facecolor=axcolor)
+# s_absorp_tex = TextBox(ax_absorp_tex, 'Absorptance', initial='', color='.95', hovercolor='1', label_pad=0.01)
+# s_absorp_tex.on_text_change(func)
+# s_absorp_tex.on_submit(func)
 
 def update(val):
     dl.Volt = s_volt.val #Etalon voltage
